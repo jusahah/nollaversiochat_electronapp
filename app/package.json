@@ -8,6 +8,11 @@
   "copyright": "© 2016, your company here",
   "main": "background.js",
   "dependencies": {
-    "fs-jetpack": "^0.7.0"
+    "fs-jetpack": "^0.7.0",
+    "lodash": "^4.1.0",
+    "moment": "^2.11.1",
+    "socket.io": "^1.4.5",
+    "socket.io-client": "^1.4.5",
+    "tablesorter": "^2.25.3"
   }
 }

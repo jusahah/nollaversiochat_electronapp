@@ -19,7 +19,7 @@ var paths = {
         './node_modules/**',
         './vendor/**',
         './**/*.html',
-        './**/*.+(jpg|png|svg)'
+        './**/*.+(jpg|png|svg|css)'
     ],
 }
 
@@ -74,6 +74,7 @@ var bundleApplication = function () {
     return Q.all([
         bundle(srcDir.path('background.js'), destDir.path('background.js')),
         bundle(srcDir.path('app.js'), destDir.path('app.js')),
+        bundle(srcDir.path('singlechat.js'), destDir.path('singlechat.js')),
     ]);
 };
 

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Entrepreneur's Chat Application</title>
+    <title>Chat with customer [insert ID]</title>
 
     <link href="./stylesheets/main.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="./stylesheets/photon.css" type="text/css">
@@ -12,11 +12,11 @@
     <script src="vendor/electron_boilerplate/external_links.js"></script>
 
     <style>
-    .viewPanel {
-        display: none;
-    }
 
-     ul#historyMsgUL {
+      .viewPanel {
+          display: none;
+      }
+      ul#msgUL {
         list-style: none;
       }
       li.ownpending {
@@ -30,21 +30,20 @@
         font-size: 15px;
       }
 
-      ul#historyMsgUL {
-        width: 470px;
+      ul#msgUL {
+        width: 400px;
         padding: 0px;
       }
 
-      ul#historyMsgUL li {
+      ul#msgUL li {
         margin-top: 0px;
         margin-bottom: 0px;
-        width: 470px;
-        text-align: left;
+        width: 380px;
         position: relative;
   
       }
 
-      ul#historyMsgUL li span.label {
+      ul#msgUL li span.label {
         font-size: 9px;
         color: #222;
         float: right;
@@ -92,24 +91,29 @@
         top: 0px;
         left: 0px;        
       }
+
+      div#msgPanelHolder {
+        height: 560px;
+        width: 80%;
+        margin: auto;
+        padding: 20px;
+        background-color: #fff;
+      }
+
       div#msgULHolder {
         height: 500px;
-        width: 500px;
+        width: 418px;
         overflow-y: auto;
         
         padding-bottom: 16px;
 
-      }     
-      span#loggedInSpan {
-        display: block;
-        height: 26px;
-        width: 100%;
-        font-size: 16px;
-        position: absolute;
-        bottom: 0px;
+      }
+
+      div#formButtonHolder {
+        margin-top: 16px;
+      }
 
 
-      } 
 
     </style>
 
@@ -123,54 +127,42 @@
       <!-- Your app's content goes inside .window-content -->
       <div class="window-content">
         <div class="pane-group">
-          <div class="pane pane-sm sidebar" id="menuElement">
-            <nav class="nav-group" id="mainmenubar">
-              <h5 class="nav-group-title">Main Menu</h5>
-              <span class="nav-group-item" data-menuaction="statuspanel">
-                Status
-              </span>
-              <span class="nav-group-item" data-menuaction="history">
-                History
-              </span>
-              <span class="nav-group-item" data-menuaction="settings">
-                Settings
-              </span>
-            </nav>
-
-            <span style="text-align: center;" id="loggedInSpan" class="nav-group-item label label-warning">Not logged in</span>
-          </div>
-
-
-
-
           <div class="pane" id="mainWindowContent" style="padding: 12px;">
-            <div class="container" style="width: 90%; height: 100%; position: relative;">
-                <div id="mainContentHolder" style="position: absolute; top: 0px; left: 0px; width: 100%; height: 700px;">
-                    <div id="statuspanel" class="viewPanel">
-                        
-             
-                    </div>
-                    <div id="history" class="viewPanel">
-                        <h3>History</h3>
-                    </div>
-                    <div id="settings" class="viewPanel">
-                        <h3>Settings</h3>
-                    </div>      
-                </div>                          
+            <h1 id="withWhom" style="text-align: center;">Single chat</h1>
+            <div id="conversations" class="singleViewPanel">
+
+           
+                <div id="msgPanelHolder" style="padding: 12px;">
+                <div id="msgULHolder">
+                  <ul id="msgUL">
+                    
+                  </ul>
+                  </div>
+                 <div id="formButtonHolder"> 
+                <form id="msgInputForm">
+                <div class="form-group">
+                  <span id="connectionDownSpan" style="display: block; height: 36px; width: 100%; font-size: 24px;" class="label label-danger">Connection Down</span>
+                  <span id="clientLeftSpan" style="display: block; height: 36px; width: 100%; font-size: 24px;" class="label label-warning">Client has left</span>
+                  <input type="text" id="msgInput" class="form-control" style="display: none;" placeholder="Write your message here">
+                </div>
+                  <button type="submit" class="btn btn-primary" id="sendMsg">Send</button>
+                  <button type="button" class="btn btn-default" id="autoScroll">Auto scroll is on</button>
+                </form>
+                </div>
+                </div>
 
             </div>
+                              
+            
           </div>
         </div>
      </div>
-     <footer class="toolbar toolbar-footer" style="height: 24px;">
-        <h1 class="title" id="defaultFooter" style="font-size: 16px;">Nollaversio Chat System</h1>
-              <div id="notifications" style="position: absolute; bottom: 0; left: 0px; height: 24px; width: 100%;">
-
-                </div>          
+     <footer class="toolbar toolbar-footer">
+        <h1 class="title">Nollaversio Chat System</h1>
       </footer>
  </div>
 
 
-    <script src="app.js"></script>
+  <script src="singlechat.js"></script>
 </body>
 </html>
