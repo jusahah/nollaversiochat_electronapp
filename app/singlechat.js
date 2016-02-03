@@ -210,6 +210,7 @@ function sendOutgoing() {
 		to: FROM_CUSTOMER
 	};
 	console.log(msg);
+	if (!msg.msg || _.trim(msg.msg) === '') return;
 	document.getElementById('msgInput').value = '';
 	pendingOutgoingMessages.push(msg);
 	pushPendingToUL(msg);
@@ -217,13 +218,47 @@ function sendOutgoing() {
 
 }
 
+function setCheckerTimeoutForMessage(arg) {
+	console.log("SET CHECKER: " + arg);
+	setTimeout(function() {
+
+		console.log("RUN CHECKER");
+		console.log(pendingOutgoingMessages.length);
+		var confirmedMsgIdx = _.findIndex(pendingOutgoingMessages, function(msg) {
+			return msg.msgID === arg.msgID;
+		});
+		if (confirmedMsgIdx !== -1) {
+			// Probably should not wait anymore
+			console.log("FOUND DEAD");
+			var msg = pendingOutgoingMessages[confirmedMsgIdx];
+			pendingOutgoingMessages.splice(confirmedMsgIdx, 1);
+			markAsPotentiallyLost(arg.msgID);
+		}
+	}, 5000);
+}
+
 function pushPendingToUL(msg) {
 	var ul = document.getElementById('msgUL');
 	var html = '<li id="' + msg.msgID + '" class="entrepreneur"><span class="entrepreneurName"><p class="senderName">You</p></span>';
 	html += '<p class="chatmsg">' + msg.msg + '</p><span class="waitingconfirmation">Waiting...</span></li>';
 	ul.innerHTML += html;
+	setCheckerTimeoutForMessage(msg);
 
 	updateScrollIfNeeded();
+
+}
+
+function markAsPotentiallyLost(msgID) {
+	console.log("LOST MARKING");
+	var li = document.getElementById(msgID);
+	var label = li.querySelector('.waitingconfirmation');	
+
+	if (li) {
+		label.className = 'potentiallyLost';
+		label.innerHTML = 'Failed';
+		li.className = 'potentiallyLost';
+	}
+
 
 }
 
