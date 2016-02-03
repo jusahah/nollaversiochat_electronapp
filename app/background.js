@@ -22,6 +22,7 @@ import env from './env';
 var mainWindow;
 
 var routingTable = {};
+var banList = [];
 
 // Preserver of the window size and position between app launches.
 var mainWindowState = windowStateKeeper('main', {
@@ -84,7 +85,9 @@ ipcMain.on('closeChat', function(event, arg) {
 ipcMain.on('banClient', function(event, arg) {
     banClient(arg.data);
 });
-
+ipcMain.on('unBanClient', function(event, arg) {
+    unBanClient(arg.data);
+});
 ipcMain.on('frontChat', function(event, arg) {
     tryToMoveChatWindowToFront(arg.data);
 });
@@ -105,6 +108,8 @@ ipcMain.on('outgoingMsg', function(event, arg) {
     var globalSettings = settingsReader.getSettings();
     var msgID = arg.msgID;
     var outGoingMsgObj = {
+        msgType: 'newMsg',
+        clientID: arg.to,
         toCustomer: arg.to,
         fromEntrepreneur: globalSettings.appOwner,
         msg: arg.msg,
@@ -151,7 +156,20 @@ function tryToMoveChatWindowToFront(clientID) {
 }
 
 function banClient(clientID) {
-    server.banClient(clientID);
+    console.log("BANNING CLIENT: " + clientID);
+    banList.push(clientID);
+    //server.banClient(clientID);
+    routingTableChange();
+}
+
+function unBanClient(clientID) {
+    console.log("Unbanning client: " + clientID);
+    var i = banList.indexOf(clientID);
+    if (i !== -1) {
+        banList.splice(i, 1);
+    }
+
+    routingTableChange();
 }
 
 function closeChatWindowProgramatically(clientID) {
@@ -164,12 +182,21 @@ function closeChatWindowProgramatically(clientID) {
 }
 
 function routingTableChange() {
-    mainWindow.webContents.send('routingTableChange', getRoutingInfo());
+    mainWindow.webContents.send('routingTableChange', getRoutingInfoWithBanned());
 }
 
 function getRoutingInfo() {
     var keys = _.keys(routingTable);
     return keys.sort();
+}
+
+function getRoutingInfoWithBanned() {
+    var keys = _.keys(routingTable);
+    keys = keys.sort();
+    return _.map(keys, function(key) {
+        return {key: key, banned: banList.indexOf(key) !== -1};
+    });
+
 }
 
 function setupSocketToServer(addr) {
@@ -232,6 +259,17 @@ function receiveMsgFromServer(msgObj) {
     */
 }
 
+function isBanned(clientID) {
+    return banList.indexOf(clientID) !== -1;
+}
+
+function rateLimitViolation(clientID) {
+    if (routingTable.hasOwnProperty(clientID)) {
+        var w = routingTable[clientID];
+        w.webContents.send('rateLimitViolation');
+    }    
+}
+
 function setupSocketListeners() {
     socket.on('connect', function() {
         console.log("CONNECTION SUCCESS");
@@ -254,11 +292,22 @@ function setupSocketListeners() {
 
     });
 
+    socket.on('rateLimitViolation', function(clientID) {
+        rateLimitViolation(clientID);
+
+    });
+
     socket.on('msgFromServer', function(msgObj) {
         console.log("MSG FROM SERVER");
         console.log(JSON.stringify(msgObj));
         if (msgObj.hasOwnProperty('tag') && !msgObj.hasOwnProperty('msgType')) {
             msgObj.msgType = msgObj.tag;
+        }
+
+        if (isBanned(msgObj.from)) {
+            // Just bail out
+            console.log("USER BANNED - DITCHING MSG");
+            return false;
         }
         server.receiveMessage(msgObj);
         //receiveMsgFromServer(msgObj);
@@ -404,6 +453,7 @@ var FakeServer = function(historySaver) {
     }
 
     this.sendMessage = function(msgObj) {
+        /*
 
         setTimeout(function() {
             this.receiveMessage({
@@ -412,7 +462,8 @@ var FakeServer = function(historySaver) {
                 stamp: Date.now()
             });
         }.bind(this), Math.random()*1000+500);
-
+    */
+        socket.emit('incomingMsg', msgObj);
         this.historySaver.newMsg({
             msgFrom: 'entrepreneur',
             conversationWith: msgObj.toCustomer,

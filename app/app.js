@@ -105,6 +105,9 @@ function StatusView(element, mediator) {
 			} else if (targetAction === 'ban') {
 				var clientID = targetEl.attr('data-whoIsClient');
 				this.sendRequestToBanClient(clientID);
+			} else if (targetAction === 'unban') {
+				var clientID = targetEl.attr('data-whoIsClient');
+				this.sendRequestToUnBanClient(clientID);				
 			}
 		}.bind(this));
 
@@ -153,7 +156,9 @@ function StatusView(element, mediator) {
 	this.sendRequestToBanClient = function(clientID) {
 		var prom = this.mediator.passData('banClient', clientID);
 	}
-
+	this.sendRequestToUnBanClient = function(clientID) {
+		var prom = this.mediator.passData('unBanClient', clientID);
+	}
 	this.updateRoutingView = function(routingData) {
 		console.warn("UPDATING ROUTING VIEW");
 		console.log(routingData);
@@ -161,6 +166,8 @@ function StatusView(element, mediator) {
 	}
 
 	this.buildRoutingTable = function(routingData) {
+		// Contains info whether banned or not
+		// array of items {key: key, banned: boolean}
 		if (!routingData) {
 
 			routingData = [];
@@ -171,12 +178,16 @@ function StatusView(element, mediator) {
 		routingData = _.sortBy(routingData, function(client) {
 			return client;
 		});
-		_.each(routingData, function(client) {
+		_.each(routingData, function(clientObj) {
+			var client = clientObj.key;
+			var isBanned = clientObj.banned;
+			var banAction = isBanned ? 'unban' : 'ban';
+			var banText   = isBanned ? 'Unignore' : 'Ignore';
 			html += "<tr>";
 			html += "<td style='text-align: center;'>" + client + "</td>";
 			html += "<td><button class='btn btn-primary btn-sm' data-tableAction='front' data-whoIsClient='" + client + "'>Front</button></td>";
 			html += "<td><button class='btn btn-danger btn-sm' data-tableAction='close' data-whoIsClient='" + client + "'>Close</button></td>"; 
-			html += "<td><button class='btn btn-default btn-sm' data-tableAction='ban' data-whoIsClient='" + client + "'>Ban Client</button></td>"; 
+			html += "<td><button class='btn btn-default btn-sm' data-tableAction='" + banAction + "' data-whoIsClient='" + client + "'>" + banText + "</button></td>"; 
 			html += "</tr>";
 		});
 

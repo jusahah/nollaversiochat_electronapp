@@ -30,16 +30,23 @@
         font-size: 15px;
       }
 
+      li.systemInfo {
+        font-size: 13px;
+        color: red;
+        font-style: italic;
+      }
+
       ul#msgUL {
-        width: 400px;
+        width: 100%;
         padding: 0px;
       }
 
       ul#msgUL li {
         margin-top: 0px;
         margin-bottom: 0px;
-        width: 380px;
+        width: 90%;
         position: relative;
+        
   
       }
 
@@ -81,7 +88,8 @@
 
       p.chatmsg {
         display: inline-block;
-        max-width: 260px;
+        width: 70%;
+        margin: 0px;
       }
 
       p.senderName {
@@ -94,7 +102,7 @@
 
       div#msgPanelHolder {
         height: 560px;
-        width: 80%;
+        width: 100%;
         margin: auto;
         padding: 20px;
         background-color: #fff;
@@ -102,7 +110,7 @@
 
       div#msgULHolder {
         height: 500px;
-        width: 418px;
+        width: 100%;
         overflow-y: auto;
         
         padding-bottom: 16px;
@@ -111,6 +119,14 @@
 
       div#formButtonHolder {
         margin-top: 16px;
+      }
+
+      span.suitableLength {
+        color: #555;
+      }
+
+      span.tooLong {
+        color: red;
       }
 
 
@@ -147,6 +163,7 @@
                 </div>
                   <button type="submit" class="btn btn-primary" id="sendMsg">Send</button>
                   <button type="button" class="btn btn-default" id="autoScroll">Auto scroll is on</button>
+                  <span id="remainingCharsSpan" style="font-size: 11px; float: right;"></span>
                 </form>
                 </div>
                 </div>
@@ -157,9 +174,7 @@
           </div>
         </div>
      </div>
-     <footer class="toolbar toolbar-footer">
-        <h1 class="title">Nollaversio Chat System</h1>
-      </footer>
+
  </div>
 
 

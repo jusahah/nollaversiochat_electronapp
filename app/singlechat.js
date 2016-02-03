@@ -71,6 +71,10 @@ ipcRenderer.on('clientLeft', function() {
 	clientLeft();
 });
 
+ipcRenderer.on('rateLimitViolation', function() {
+	rateLimitViolation();
+})
+
 document.onkeydown = function(e) {
 	console.log("KEY PRESS");
 	var evtobj = window.event ? event : e;
@@ -99,6 +103,35 @@ document.getElementById('msgInputForm').addEventListener('submit', function(e) {
 document.getElementById('autoScroll').addEventListener('click', function(e) {
 	changeAutoScroll();
 });
+
+document.getElementById('msgInput').addEventListener('input', function() {
+	showRemainingChars(document.getElementById('msgInput').value);
+	console.log("CHANGE IN MSGH");
+});
+
+function rateLimitViolation() {
+	var ul = document.getElementById('msgUL');
+	var html = '<li class="systemInfo">Msg rate too high (slow down!)</li>';
+	ul.innerHTML += html;
+
+	updateScrollIfNeeded();	
+}
+
+function showRemainingChars(textInput) {
+	var rem = 512 - _.trim(textInput).length;
+	var span = document.getElementById('remainingCharsSpan');
+	span.className = 'suitableLength';
+	if (rem === 512) {
+		// Nothing written
+		span.innerHTML = '';
+	} else if(rem > -1) {
+		span.innerHTML = rem + ' chars remaining';
+	} else {
+		span.className = 'tooLong';
+		span.innerHTML = 'Too long input!';
+	}
+}
+
 
 function clientLeft() {
 	document.getElementById('msgInput').style.display = 'none';
@@ -171,6 +204,7 @@ function sendOutgoing() {
 	console.log("SEND OUTGOING MSG FROM SINGLE CHAT!");
 	var msgID = FROM_CUSTOMER + "_" + Date.now() + "_" + randomPostFix(6);
 	var msg = {
+		msgType: 'newMsg',
 		msgID: msgID,
 		msg: document.getElementById('msgInput').value,
 		to: FROM_CUSTOMER
