@@ -29,7 +29,7 @@ var viewHandler = new ViewHandler(mediator);
 
 // Holy crap! This is browser window with HTML and stuff, but I can read
 // here files like it is node.js! Welcome to Electron world :)
-console.log('The author of this app is:', appDir.read('package.json', 'json').author);
+//console.log('The author of this app is:', appDir.read('package.json', 'json').author);
 
 document.addEventListener('DOMContentLoaded', function () {
 	viewHandler.registerView('settings', document.getElementById('settings'), new SettingsView(document.getElementById('settings'), mediator));
@@ -59,6 +59,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	ipcRenderer.on('connectionToServerLost', function() {
 		mediator.connectionToServerLost();
+	});
+
+	ipcRenderer.on('playNewWindowSound', function() {
+		console.log("PLAYING SOUND IN MAIN WINDOW");
+		var snd = new Audio("sounds/newWindow.wav");
+		snd.play();
 	});
 
 

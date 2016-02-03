@@ -19,6 +19,7 @@ var paths = {
         './node_modules/**',
         './vendor/**',
         './**/*.html',
+        './**/*.wav',
         './**/*.+(jpg|png|svg|css)'
     ],
 }

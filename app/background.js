@@ -8,6 +8,7 @@ import { app, BrowserWindow } from 'electron';
 import jquery from 'jquery';
 import devHelper from './vendor/electron_boilerplate/dev_helper';
 import windowStateKeeper from './vendor/electron_boilerplate/window_state';
+const shell = require('electron').shell;
 
 // Socket to server
 var socket = require('socket.io-client')('http://localhost:8090');
@@ -339,6 +340,7 @@ function setupSocketListeners() {
 
 app.on('ready', function () {
 
+
     setupSocketListeners();
     historySaver = new HistorySaver();
     server = new FakeServer(historySaver);
@@ -361,6 +363,10 @@ app.on('ready', function () {
                 routingTable[msgObj.from].openDevTools();
                 routingTable[msgObj.from].webContents.on('did-finish-load', function() {
                     console.log("ONE CHAT LOADED!");
+                    if (settingsReader.getSettings().soundAlarm) {
+                        mainWindow.webContents.send('playNewWindowSound');
+                    }
+                    
                     routingTable[msgObj.from].webContents.send('initialData', {msg: msgObj.msg, from: msgObj.from, connected: isConnectionUp});
                 });
 
