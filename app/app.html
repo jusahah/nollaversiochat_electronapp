@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Entrepreneur's Chat Application</title>
+    <title>AsiakasChat - Hallintapuoli</title>
 
     <link href="./stylesheets/main.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="./stylesheets/photon.css" type="text/css">
@@ -111,6 +111,12 @@
 
       } 
 
+      .mainMenuViewLink {
+        cursor: pointer;
+      }
+
+
+
     </style>
 
     
@@ -125,19 +131,20 @@
         <div class="pane-group">
           <div class="pane pane-sm sidebar" id="menuElement">
             <nav class="nav-group" id="mainmenubar">
-              <h5 class="nav-group-title">Main Menu</h5>
-              <span class="nav-group-item" data-menuaction="statuspanel">
-                Status
+              <h5 class="nav-group-title" style="padding: 0px;"><span class="label label-primary" style="display: inline-block; width: 100%; padding-left: 26px; font-size: 20px; text-align: left;">Päävalikko</span></h5>
+
+              <span class="nav-group-item mainMenuViewLink" id="menu_statuspanel" data-menuaction="statuspanel">
+                Hallintapaneeli
               </span>
-              <span class="nav-group-item" data-menuaction="history">
-                History
+              <span class="nav-group-item mainMenuViewLink" id="menu_history" data-menuaction="history">
+                Keskusteluhistoria
               </span>
-              <span class="nav-group-item" data-menuaction="settings">
-                Settings
+              <span class="nav-group-item mainMenuViewLink" id="menu_settings" data-menuaction="settings">
+                Asetukset
               </span>
             </nav>
 
-            <span style="text-align: center;" id="loggedInSpan" class="nav-group-item label label-warning">Not logged in</span>
+            <span style="text-align: center;" id="loggedInSpan" class="nav-group-item label label-warning">Ei kirjautunut</span>
           </div>
 
 
@@ -151,10 +158,10 @@
              
                     </div>
                     <div id="history" class="viewPanel">
-                        <h3>History</h3>
+                        <h3>Historia</h3>
                     </div>
                     <div id="settings" class="viewPanel">
-                        <h3>Settings</h3>
+                        <h3>Asetukset</h3>
                     </div>      
                 </div>                          
 
@@ -163,7 +170,7 @@
         </div>
      </div>
      <footer class="toolbar toolbar-footer" style="height: 24px;">
-        <h1 class="title" id="defaultFooter" style="font-size: 16px;">Nollaversio Chat System</h1>
+        <h1 class="title" id="defaultFooter" style="font-size: 16px;">AsiakasChat | Yrittäjän Hallintapuoli</h1>
               <div id="notifications" style="position: absolute; bottom: 0; left: 0px; height: 24px; width: 100%;">
 
                 </div>          

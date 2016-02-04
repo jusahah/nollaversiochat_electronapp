@@ -111,7 +111,7 @@ document.getElementById('msgInput').addEventListener('input', function() {
 
 function rateLimitViolation() {
 	var ul = document.getElementById('msgUL');
-	var html = '<li class="systemInfo">Msg rate too high (slow down!)</li>';
+	var html = '<li class="systemInfo">Liian nopea viestien lähetys - hidasta!</li>';
 	ul.innerHTML += html;
 
 	updateScrollIfNeeded();	
@@ -125,10 +125,10 @@ function showRemainingChars(textInput) {
 		// Nothing written
 		span.innerHTML = '';
 	} else if(rem > -1) {
-		span.innerHTML = rem + ' chars remaining';
+		span.innerHTML = rem + ' kirjainta jälj.';
 	} else {
 		span.className = 'tooLong';
-		span.innerHTML = 'Too long input!';
+		span.innerHTML = 'Liian pitkä!';
 	}
 }
 
@@ -240,7 +240,7 @@ function setCheckerTimeoutForMessage(arg) {
 function pushPendingToUL(msg) {
 	var ul = document.getElementById('msgUL');
 	var html = '<li id="' + msg.msgID + '" class="entrepreneur"><span class="entrepreneurName"><p class="senderName">Minä</p></span>';
-	html += '<p class="chatmsg">' + msg.msg + '</p><span class="waitingconfirmation">Waiting...</span></li>';
+	html += '<p class="chatmsg">' + msg.msg + '</p><span class="waitingconfirmation">Lähetetään...</span></li>';
 	ul.innerHTML += html;
 	setCheckerTimeoutForMessage(msg);
 

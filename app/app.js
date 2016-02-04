@@ -68,6 +68,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		snd.play();
 	});
 
+	setTimeout(function() {
+		menuActionTrigger('statuspanel');
+	}, 0);
+
 
    
 });
@@ -79,13 +83,17 @@ mainmenubar.addEventListener('click', function(e) {
 	var menuaction = e.target.dataset.menuaction;
 
 	if (menuaction) {
-		var targetSpan = jquery(e.target);
-		targetSpan.addClass('active');
-		targetSpan.siblings('span').removeClass('active');
-		viewHandler.changeToView(menuaction);
+		menuActionTrigger(menuaction);
 	
 	}
 });
+
+function menuActionTrigger(menuaction) {
+	var targetSpan = jquery('#menu_' + menuaction);
+	targetSpan.addClass('active');
+	targetSpan.siblings('span').removeClass('active');
+	viewHandler.changeToView(menuaction);
+}
 
 function StatusView(element, mediator) {
 	this.element = element;
@@ -181,6 +189,12 @@ function StatusView(element, mediator) {
 		}
 		console.log("Routing data in table builder");
 		console.log(routingData);
+
+		if (routingData.length === 0) {
+			jquery(this.element).find('#noconversationsgoing').show();
+		} else {
+			jquery(this.element).find('#noconversationsgoing').hide();
+		}
 		var html = '';
 		routingData = _.sortBy(routingData, function(client) {
 			return client;
