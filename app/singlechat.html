@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Chat with customer [insert ID]</title>
+    <title>Chat-ikkuna</title>
 
     <link href="./stylesheets/main.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="./stylesheets/photon.css" type="text/css">
@@ -163,7 +163,7 @@
       <div class="window-content">
         <div class="pane-group">
           <div class="pane" id="mainWindowContent" style="padding: 12px;">
-            <h1 id="withWhom" style="text-align: center;">Single chat</h1>
+            <h1 id="withWhom" style="text-align: center;">Asiakas: </h1>
             <div id="conversations" class="singleViewPanel">
 
            
@@ -176,12 +176,12 @@
                  <div id="formButtonHolder"> 
                 <form id="msgInputForm">
                 <div class="form-group">
-                  <span id="connectionDownSpan" style="display: block; height: 36px; width: 100%; font-size: 24px;" class="label label-danger">Connection Down</span>
-                  <span id="clientLeftSpan" style="display: block; height: 36px; width: 100%; font-size: 24px;" class="label label-warning">Client has left</span>
-                  <input type="text" id="msgInput" class="form-control" style="display: none;" placeholder="Write your message here">
+                  <span id="connectionDownSpan" style="display: block; height: 36px; width: 100%; font-size: 24px;" class="label label-danger">Yhteys menetetty</span>
+                  <span id="clientLeftSpan" style="display: block; height: 36px; width: 100%; font-size: 24px;" class="label label-warning">Asiakas poistui</span>
+                  <input type="text" id="msgInput" class="form-control" style="display: none;" placeholder="Kirjoita tähän viestisi asiakkaalle">
                 </div>
-                  <button type="submit" class="btn btn-primary" id="sendMsg">Send</button>
-                  <button type="button" class="btn btn-default" id="autoScroll">Auto scroll is on</button>
+                  <button type="submit" class="btn btn-primary" id="sendMsg">Lähetä</button>
+                  <button type="button" class="btn btn-default" id="autoScroll">Autoskrollaus</button>
                   <span id="remainingCharsSpan" style="font-size: 11px; float: right;"></span>
                 </form>
                 </div>

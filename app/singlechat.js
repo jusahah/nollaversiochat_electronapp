@@ -28,7 +28,7 @@ ipcRenderer.on('initialData', function(event, arg) {
   FROM_CUSTOMER = arg.from;
   FROM_CUSTOMER_SCREENNAME = arg.from.split("_")[0];
   initialConnectionStatus(arg.connected);
-  document.getElementById('withWhom').innerHTML = "Single chat with " + FROM_CUSTOMER_SCREENNAME;
+  document.getElementById('withWhom').innerHTML = "Keskustelu: " + FROM_CUSTOMER_SCREENNAME;
   showClientMsg(arg.msg);
 });
 
@@ -179,7 +179,7 @@ function changeAutoScroll(newState) {
 }
 
 function updateAutoScrollText() {
-	document.getElementById('autoScroll').innerHTML = autoScrollState ? "Auto scroll is on" : "Auto scroll is off";
+	document.getElementById('autoScroll').innerHTML = autoScrollState ? "Autoskrollaus: ON" : "Autoskrollaus: OFF";
 }
 
 function updateScrollIfNeeded() {
@@ -239,7 +239,7 @@ function setCheckerTimeoutForMessage(arg) {
 
 function pushPendingToUL(msg) {
 	var ul = document.getElementById('msgUL');
-	var html = '<li id="' + msg.msgID + '" class="entrepreneur"><span class="entrepreneurName"><p class="senderName">You</p></span>';
+	var html = '<li id="' + msg.msgID + '" class="entrepreneur"><span class="entrepreneurName"><p class="senderName">Minä</p></span>';
 	html += '<p class="chatmsg">' + msg.msg + '</p><span class="waitingconfirmation">Waiting...</span></li>';
 	ul.innerHTML += html;
 	setCheckerTimeoutForMessage(msg);
@@ -274,7 +274,7 @@ function confirmMsgInUL(msg) {
 }
 
 function showClientMsg(msg) {
-	var html = '<li class="client"><span class="clientName"><p class="senderName">Client</p></span>';
+	var html = '<li class="client"><span class="clientName"><p class="senderName">Asiakas</p></span>';
 	html += '<p class="chatmsg">' + msg + '</p><span class="showConfirmTime">' + getBeautifiedTimeString(msg.stamp) + '</span></li>';
 	document.getElementById('msgUL').innerHTML += html;
 	updateScrollIfNeeded();

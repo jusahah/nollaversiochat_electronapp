@@ -60,7 +60,7 @@ ipcMain.on('settings', function(event, arg) {
 ipcMain.on('routingTable', function(event, arg) {
     // arg is always message identifier
     
-    mainWindow.webContents.send('replyToMsg', {id: arg, data: getRoutingInfo(), operationSuccess: true});
+    mainWindow.webContents.send('replyToMsg', {id: arg, data: getRoutingInfoWithBanned(), operationSuccess: true});
 });
 
 ipcMain.on('history', function(event, arg) {
@@ -112,7 +112,7 @@ ipcMain.on('outgoingMsg', function(event, arg) {
         msgType: 'newMsg',
         clientID: arg.to,
         toCustomer: arg.to,
-        fromEntrepreneur: globalSettings.appOwner,
+        fromEntrepreneur: globalSettings.visibleNameToClients,
         msg: arg.msg,
         id: msgID,
     };
@@ -183,6 +183,7 @@ function closeChatWindowProgramatically(clientID) {
 }
 
 function routingTableChange() {
+    console.log("---SENDING ROUTING TABLE DATA---");
     mainWindow.webContents.send('routingTableChange', getRoutingInfoWithBanned());
 }
 
@@ -486,6 +487,7 @@ var FakeServer = function(historySaver) {
         }
 
         if (msg.msgType === 'newMsg') {
+
             this.historySaver.newMsg({
                 msgFrom: 'client',
                 conversationWith: msg.from,
@@ -542,12 +544,12 @@ var FakeServer = function(historySaver) {
 function SettingsReader() {
 
     this.settings;
-    this.filePath = './asiakaschatsettings.json';
+    this.filePath = app.getPath('userData') + '/asiakaschatsettings.json';
 
     this.defaultSettings = {
         autoCloseWindows: true,
         appOwner: '_unknown_',
-        visibleNameToClients: 'Entrepreneur',
+        visibleNameToClients: 'Yrittäjä',
         connectedToSite: '_unknown_',
         constantWriteToHistory: false,
         sitePassword: '12345678',
@@ -561,15 +563,20 @@ function SettingsReader() {
     }
 
     this.saveNewSettings = function(settingsObject) {
+        console.log(JSON.stringify(settingsObject));
 
         console.log("SAVING SETTINGS");
 
         var currentSettings = this.getSettings();
         var currentSettingsCopy = _.clone(currentSettings);
         this.settings = _.assign(currentSettings, settingsObject);
+        console.log(JSON.stringify(this.settings));
+
         try {
             fs.writeFileSync(this.filePath, JSON.stringify(this.settings), 'utf8');
+            //console.log(err);
         } catch(err){ 
+
             console.log("ERROR IN FILE SAVING");
             return false;
         }
@@ -591,6 +598,7 @@ function SettingsReader() {
     this.init = function() {
         this.createFileIfNotThere();
         this.settings = JSON.parse(fs.readFileSync(this.filePath, 'utf8'));
+        console.log(JSON.stringify(this.settings));
 
     }
 
@@ -598,8 +606,10 @@ function SettingsReader() {
         try{
             fs.statSync(this.filePath);
           }catch(err){
+            console.log(err);
             if(err.code == 'ENOENT') {
                 // File does not exist!
+                console.log("CREATE SETTINGS FILE");
                 fs.appendFileSync(this.filePath, JSON.stringify(this.defaultSettings), 'utf8');
             }
           }        
@@ -643,7 +653,7 @@ function HistoryReader() {
 */
 function HistorySaver() {
 
-    this.filePath = './historyconversations.json';
+    this.filePath = app.getPath('userData') + '/historyconversations.json';
 
     this.inMemoryChatStreams = {};
 
@@ -657,9 +667,11 @@ function HistorySaver() {
         try{
             fs.statSync(this.filePath);
           }catch(err){
+            console.log(err);
             if(err.code == 'ENOENT') {
                 // File does not exist!
-                fs.appendFileSync(this.filePath, JSON.stringify({stamp: '100000000', conversationWith: 'mr_test', msgFrom: 'client', msg: 'Hey test!'}) + ",", 'utf8');
+                console.log("CREATE HISTORY FILE");
+                fs.writeFileSync(this.filePath, JSON.stringify({stamp: '100000000', conversationWith: 'mr_test', msgFrom: 'client', msg: 'Initia test message!'}) + ",", 'utf8');
             }
           }        
     }
@@ -673,6 +685,7 @@ function HistorySaver() {
     }
 
     this.newMsg = function(msg) {
+        if (!settingsReader.getSettings().constantWriteToHistory) return false; // Write is off
         fs.appendFileSync(this.filePath, JSON.stringify(msg) + ",", 'utf8');
     }
 

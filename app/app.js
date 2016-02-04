@@ -10,7 +10,8 @@ import env from './env';
 import jquery from 'jquery';
 import moment from 'moment';
 const ipcRenderer = require('electron').ipcRenderer;
-var _ = require('lodash')
+var _ = require('lodash');
+var Joi = require('joi');
 // Dynamically load HTML views into DOM
 jquery('#statuspanel').load("views/statuspanel.html");
 jquery('#settings').load("views/settings.html");
@@ -188,11 +189,11 @@ function StatusView(element, mediator) {
 			var client = clientObj.key;
 			var isBanned = clientObj.banned;
 			var banAction = isBanned ? 'unban' : 'ban';
-			var banText   = isBanned ? 'Unignore' : 'Ignore';
+			var banText   = isBanned ? 'Salli' : 'Estä';
 			html += "<tr>";
 			html += "<td style='text-align: center;'>" + client + "</td>";
-			html += "<td><button class='btn btn-primary btn-sm' data-tableAction='front' data-whoIsClient='" + client + "'>Front</button></td>";
-			html += "<td><button class='btn btn-danger btn-sm' data-tableAction='close' data-whoIsClient='" + client + "'>Close</button></td>"; 
+			html += "<td><button class='btn btn-primary btn-sm' data-tableAction='front' data-whoIsClient='" + client + "'>Tuo Eteen</button></td>";
+			html += "<td><button class='btn btn-danger btn-sm' data-tableAction='close' data-whoIsClient='" + client + "'>Sulje</button></td>"; 
 			html += "<td><button class='btn btn-default btn-sm' data-tableAction='" + banAction + "' data-whoIsClient='" + client + "'>" + banText + "</button></td>"; 
 			html += "</tr>";
 		});
@@ -215,6 +216,38 @@ function SettingsView(element, mediator) {
 
 	this.formSubmitHandler;
 
+	this.settingsSchema = Joi.object().keys({
+		visibleNameToClients: Joi.string().min(1).max(12).required(),
+		connectedToSite: Joi.string().alphanum().min(8).max(8).required(),
+		sitePassword: Joi.string().alphanum().min(7).max(7).required(),
+		autoCloseWindows: Joi.boolean(),
+		constantWriteToHistory: Joi.boolean(),
+		soundAlarm: Joi.boolean()
+	});
+	this.settingsSchemaToHumanReadable = {
+		visibleNameToClients: 'Asiakkaalle näkyvä nimesi',
+		connectedToSite: 'Sivuavain',
+		sitePassword: 'Sivusalana',
+		autoCloseWindows: 'Chat-ikkunan autom. sulkeminen',
+		constantWriteToHistory: 'Viestien tallennus levylle',
+		soundAlarm: 'Äänimerkki keskustelun alkaessa'
+	};
+	this.validateSettingsInput = function(settingsObject) {
+		var fieldThatFailed = 0;
+		console.log("VALIDATING SETTINGS INPUT");
+		Joi.validate(settingsObject, this.settingsSchema, function(err, value) {
+			if (err) {
+				console.error("VALID FAIL");
+				console.log(err.details);
+				console.log(value);
+				fieldThatFailed = err.details[0].path;
+			}
+		});
+
+		return fieldThatFailed;
+
+	}
+
 	this.initSubmitHandler = function() {
 		var container = jquery(this.element);
 		var form = container.find("#settingsform");
@@ -230,18 +263,25 @@ function SettingsView(element, mediator) {
 			settingsObject.connectedToSite = container.find('#sitekey_input').val();
 			settingsObject.sitePassword = container.find('#sitepassword_input').val();
 			settingsObject.autoCloseWindows = container.find('#autoclose_select').val() === 'yes';
-			settingsObject.constantWriteToHistory = container.find('#saveconversations_select').val() === 'yes';
+			settingsObject.constantWriteToHistory = container.find('#conversationstofile_select').val() === 'yes';
 			settingsObject.soundAlarm = container.find('#soundalarms_select').val() === 'yes';
 			console.log(settingsObject);
+			var failedField = this.validateSettingsInput(settingsObject);
+			if (failedField !== 0) {
+				console.log("FAILED FIELD: " + failedField);
+				this.mediator.notification('warning', 'Virheellinen syöte kenttään: ' + this.settingsSchemaToHumanReadable[failedField]);
+				return false;
+			}
+
 
 			var prom = this.mediator.passData('newSettings', settingsObject);
 			prom.done(function() {
-				this.mediator.notification('success', 'Settings have been saved to disk!');
+				this.mediator.notification('success', 'Asetusten tallennus onnistui!');
 				this.getDataAndRedraw();
 			}.bind(this));
 
 			prom.fail(function() {
-				this.mediator.notification('danger', 'Possible failure while saving settings!');
+				this.mediator.notification('danger', 'Asetusten tallennus epäonnistui!');
 				this.getDataAndRedraw();
 			}.bind(this));
 		}.bind(this));
@@ -275,7 +315,7 @@ function SettingsView(element, mediator) {
 		var siteKeyInput = container.find('#sitekey_input');
 		var sitePasswordInput = container.find('#sitepassword_input');
 		var autoCloseSelect = container.find('#autoclose_select');
-		var saveConversationsSelect = container.find('#saveconversations_select');
+		var saveConversationsSelect = container.find('#conversationstofile_select');
 		var soundAlarmsSelect = container.find('#soundalarms_select');
 
 		autoCloseSelect.val(data.autoCloseWindows ? "yes" : "no");
@@ -361,13 +401,13 @@ function HistoryView(element, mediator) {
 
 	this.createClientLi = function(msg) {
 
-		var html = '<li class="client"><span class="clientName"><p class="senderName">Client</p></span>';
+		var html = '<li class="client"><span class="clientName"><p class="senderName">Asiakas</p></span>';
 		html += '<p class="chatmsg">' + msg.msg + '</p><span class="showConfirmTime">' + this.getBeautifiedTimeString(msg.stamp) + '</span></li>';
 		return html;
 	}
 
 	this.createOwnLi = function(msg) {
-		var html = '<li id="' + msg.msgID + '" class="entrepreneur"><span class="entrepreneurName"><p class="senderName">You</p></span>';
+		var html = '<li id="' + msg.msgID + '" class="entrepreneur"><span class="entrepreneurName"><p class="senderName">Yrittäjä</p></span>';
 		html += '<p class="chatmsg">' + msg.msg + '</p><span class="showConfirmTime">'+this.getBeautifiedTimeString(msg.stamp)+'</span></li>';
 		return html;		
 	}
@@ -397,6 +437,10 @@ function HistoryView(element, mediator) {
 		console.log("HTML");
 		console.log(html);
 		console.log(jquery(this.element).find('#historyMsgUL'));
+		if (conversationWith.indexOf('_') !== -1) {
+			conversationWith = conversationWith.split('_')[0];
+		}
+		jquery(this.element).find('#historyWith').empty().append('Keskustelu: ' + conversationWith);
 		jquery(this.element).find('#historyMsgUL').empty().append(html);
 
 
@@ -508,13 +552,13 @@ function Mediator(notifications) {
 		var menuElement = jquery('#menuElement');
 		var spanEl = menuElement.find('#loggedInSpan');
 		spanEl.removeClass('label-danger label-success').addClass('label-warning');
-		spanEl.empty().append('Connection lost!');
-		this.notification('danger', 'Connection server is down! Reconnecting...');	
+		spanEl.empty().append('Yhteys menetetty!');
+		this.notification('danger', 'Yhteys palvelimeen menetetty! Yhdistetään uudelleen...');	
 	}
 
 	this.restartRequired = function() {
 		console.log("RESTART REQUIRED");
-		this.notification('warning', 'Settings saved! Application must be restarted for new settings to apply!');
+		this.notification('warning', 'Asetukset tallennettu! Käynnistä sovellus uudestaan jotta asetukset tulevat voimaan!');
 	}
 
 	this.amILoggedInToServer = function(msgObj) {
@@ -525,14 +569,14 @@ function Mediator(notifications) {
 		var spanEl = menuElement.find('#loggedInSpan');
 
 		if (success) {
-			this.notification('success', 'Successfully connected in as entrepreneur!');
+			this.notification('success', 'Olet kirjautunut sisään onnistuneesti!');
 			spanEl.removeClass('label-warning label-danger').addClass('label-success');
-			spanEl.empty().append('Connected To: ' + sitekey);
+			spanEl.empty().append('Kirjautunut: ' + sitekey);
 
 		} else {
-			this.notification('danger', 'Authorization failed - check sitekey and site password combination!');
+			this.notification('danger', 'Kirjautuminen epäonnistui - tarkista sivuavain ja sivusalasana!');
 			spanEl.removeClass('label-success label-warning').addClass('label-danger');
-			spanEl.empty().append('Login Fail');			
+			spanEl.empty().append('Ei kirjautunut');			
 		}
 	}
 

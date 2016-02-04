@@ -9,6 +9,7 @@
   "main": "background.js",
   "dependencies": {
     "fs-jetpack": "^0.7.0",
+    "joi": "^7.2.3",
     "lodash": "^4.1.0",
     "moment": "^2.11.1",
     "socket.io": "^1.4.5",
